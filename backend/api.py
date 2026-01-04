@@ -7,6 +7,8 @@ import logging
 import os
 from datetime import datetime
 from detection_engine import HybridEngine
+from settings_manager import SettingsManager
+from email_service import EmailService
 
 # Setup
 app = FastAPI(title="AlertForge API")
@@ -23,6 +25,8 @@ logger = logging.getLogger("AlertForgeAPI")
 
 # Engine
 engine = HybridEngine()
+settings_manager = SettingsManager()
+email_service = EmailService(settings_manager)
 
 # Data Storage (In-memory for demo)
 stats = {
@@ -54,9 +58,26 @@ def get_stats():
 def get_alerts():
     return recent_alerts
 
+@app.get("/rules")
+def get_rules():
+    """Returns the content of the YARA rules file."""
+    try:
+        with open("rules.yar", "r") as f:
+            return {"content": f.read()}
+    except FileNotFoundError:
+        return {"content": "rules.yar not found."}
+
 @app.get("/logs")
 def get_logs(limit: int = 50):
     return recent_logs[:limit]
+
+@app.get("/settings")
+def get_settings():
+    return settings_manager.get_all()
+
+@app.post("/settings")
+def update_settings(new_settings: dict):
+    return settings_manager.update(new_settings)
 
 def process_log(log_data):
     """
@@ -84,11 +105,19 @@ def process_log(log_data):
         }
         recent_alerts.insert(0, alert)
         
-        # Simulate Automated Response (Block IP)
-        if result["confidence"] > 0.8:
+        # Automated Response (Dynamic)
+        auto_block = settings_manager.get("auto_block", True)
+        block_threshold = settings_manager.get("block_threshold", 0.8)
+
+        if auto_block and result["confidence"] > block_threshold:
             logger.warning(f"BLOCKING IP: {log_data.get('source_ip')}")
             stats["threats_blocked"] += 1
             # In a real app, we would call: os.system(f"iptables -A INPUT -s {ip} -j DROP")
+
+        # Instant Email Alerts
+        email_alerts = settings_manager.get("email_alerts", False)
+        if email_alerts and result["is_threat"]:
+             email_service.send_alert(alert)
             
     # Add to logs list
     log_display = log_data.copy()

@@ -1,16 +1,19 @@
 import { Home, Activity, Settings, Shield, FileText, Menu } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
+    const pathname = usePathname();
 
     const items = [
-        { icon: <Home size={20} />, label: "Dashboard", active: true },
-        { icon: <Activity size={20} />, label: "Live Monitoring" },
-        { icon: <FileText size={20} />, label: "Logs Explorer" },
-        { icon: <Shield size={20} />, label: "Threat Intelligence" },
-        { icon: <Settings size={20} />, label: "Settings" },
+        { icon: <Home size={20} />, label: "Dashboard", href: "/" },
+        { icon: <Activity size={20} />, label: "Live Monitoring", href: "/live" },
+        { icon: <FileText size={20} />, label: "Logs Explorer", href: "/logs" },
+        { icon: <Shield size={20} />, label: "Threat Intelligence", href: "/threats" },
+        { icon: <Settings size={20} />, label: "Settings", href: "/settings" },
     ];
 
     return (
@@ -35,29 +38,32 @@ export function Sidebar() {
             </div>
 
             <nav className="flex-1 px-3 space-y-1 mt-6">
-                {items.map((item) => (
-                    <a
-                        key={item.label}
-                        href="#"
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-medium ${item.active
-                            ? "bg-primary/10 text-primary border border-primary/20"
-                            : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-                            }`}
-                    >
-                        {item.icon}
-                        {!collapsed && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{item.label}</motion.span>}
-                    </a>
-                ))}
+                {items.map((item) => {
+                    const isActive = pathname === item.href || (item.href === "/" && pathname === "/");
+                    return (
+                        <Link
+                            key={item.label}
+                            href={item.href}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all font-medium ${isActive
+                                ? "bg-primary/10 text-primary border border-primary/20"
+                                : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                                }`}
+                        >
+                            {item.icon}
+                            {!collapsed && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{item.label}</motion.span>}
+                        </Link>
+                    );
+                })}
             </nav>
 
             <div className="p-4 border-t border-slate-800 bg-slate-900/50">
                 <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
                     <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold text-white shadow-lg">
-                        JD
+                        B
                     </div>
                     {!collapsed && (
                         <div className="overflow-hidden">
-                            <div className="text-sm font-semibold text-slate-200">John Doe</div>
+                            <div className="text-sm font-semibold text-slate-200">Bala</div>
                             <div className="text-xs text-slate-400">Security Admin</div>
                         </div>
                     )}

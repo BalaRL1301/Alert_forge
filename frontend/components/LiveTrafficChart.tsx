@@ -6,7 +6,7 @@ interface DataPoint {
     value: number;
 }
 
-export function LiveTrafficChart({ data }: { data: DataPoint[] }) {
+export function LiveTrafficChart({ data, height = 300 }: { data: DataPoint[], height?: number }) {
     // Mock data if empty
     const chartData = data.length > 0 ? data : [
         { time: '10:00', value: 12 },
@@ -17,12 +17,12 @@ export function LiveTrafficChart({ data }: { data: DataPoint[] }) {
     ];
 
     return (
-        <Card className="h-[300px] w-full">
+        <Card className={`h-[${height}px] w-full`}>
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                 Network Traffic Volume
             </h3>
-            <div className="h-[220px] w-full">
+            <div style={{ height: height - 80 }} className="w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData}>
                         <defs>
