@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
-import { Download, Search, Filter, AlertTriangle, CheckCircle, ChevronDown, ChevronRight, X } from "lucide-react";
+import { Download, Search, Filter, AlertTriangle, CheckCircle, ChevronDown, ChevronRight, X, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_URL = "http://localhost:8000";
@@ -215,6 +215,22 @@ export default function LogsExplorer() {
                                             <p className="text-slate-300 font-mono text-sm whitespace-pre-wrap">{selectedLog.analysis.details}</p>
                                         </div>
                                     )}
+
+                                    {/* AI Analysis Report */}
+                                    {selectedLog.ai_analysis && (
+                                        <div className="bg-slate-900 border border-indigo-500/30 rounded-lg p-6 relative overflow-hidden group">
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div className="p-1.5 rounded bg-indigo-500/10 text-indigo-400">
+                                                    <Zap size={16} />
+                                                </div>
+                                                <h3 className="font-bold text-indigo-100">AI Security Analyst Report</h3>
+                                            </div>
+                                            <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+                                                {selectedLog.ai_analysis}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Raw Data Section */}
@@ -246,8 +262,8 @@ function FilterBtn({ label, active, onClick, icon }: { label: string, active: bo
         <button
             onClick={onClick}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${active
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                    : "text-slate-400 hover:text-white hover:bg-slate-700"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-700"
                 }`}
         >
             {icon} {label}

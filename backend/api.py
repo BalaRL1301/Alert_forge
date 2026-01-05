@@ -9,6 +9,8 @@ from datetime import datetime
 from detection_engine import HybridEngine
 from settings_manager import SettingsManager
 from email_service import EmailService
+from ai_service import AIService
+from attack_simulator import AttackSimulator
 
 # Setup
 app = FastAPI(title="AlertForge API")
@@ -27,6 +29,8 @@ logger = logging.getLogger("AlertForgeAPI")
 engine = HybridEngine()
 settings_manager = SettingsManager()
 email_service = EmailService(settings_manager)
+ai_service = AIService()
+simulator = AttackSimulator()
 
 # Data Storage (In-memory for demo)
 stats = {
@@ -103,6 +107,10 @@ def process_log(log_data):
             "confidence": result["confidence"],
             "details": result["details"]
         }
+        
+        # GenAI Analysis
+        alert["ai_analysis"] = ai_service.generate_analysis(log_data)
+        
         recent_alerts.insert(0, alert)
         
         # Automated Response (Dynamic)
@@ -159,3 +167,19 @@ async def simulate_log(log: LogMessage):
     data = log.dict()
     process_log(data)
     return {"status": "processed", "data": data}
+
+@app.post("/simulate/attack")
+def simulate_attack(type: str):
+    """Trigger a simulated attack."""
+    logger.info(f"Starting simulation: {type}")
+    
+    if type == "sqli":
+        logs = simulator.run_sql_injection()
+    elif type == "xss":
+        logs = simulator.run_xss_storm()
+    elif type == "brute":
+        logs = simulator.run_brute_force()
+    else:
+        return {"status": "error", "message": "Unknown attack type"}
+        
+    return {"status": "completed", "logs": logs}

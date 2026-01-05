@@ -1,4 +1,4 @@
-import { Home, Activity, Settings, Shield, FileText, Menu } from "lucide-react";
+import { Home, Activity, Settings, Shield, FileText, Menu, Zap } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -13,6 +13,7 @@ export function Sidebar() {
         { icon: <Activity size={20} />, label: "Live Monitoring", href: "/live" },
         { icon: <FileText size={20} />, label: "Logs Explorer", href: "/logs" },
         { icon: <Shield size={20} />, label: "Threat Intelligence", href: "/threats" },
+        { icon: <Zap size={20} />, label: "Attack Simulator", href: "/simulator" },
         { icon: <Settings size={20} />, label: "Settings", href: "/settings" },
     ];
 
